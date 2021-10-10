@@ -22,3 +22,7 @@ Some samples:
 
 	$result = $GermanAddressValidation->validateAddress('München', 'Erika-Mann-Straße 33', '80636');
 	echo 'validateAddress:'.($result?'true':'false').PHP_EOL;
+
+Run phpunit with docker:
+
+	docker run -it --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp php:7.4-cli php phpunit.phar testGermanAddressValidation.php
