@@ -15,33 +15,33 @@ class GermanAddressValidation
     public $lastResult;
 
     /**
-     * @param array $postfields
-     * @return json
+     * @param array $postFields
+     * @return stdClass
      * @throws Exception
      */
-    protected function request(array $postfields)
+    protected function request(array $postFields): stdClass
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, self::URL);
         curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($postfields));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($postFields));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $this->lastResult = curl_exec($curl);
         if ($this->lastResult === false) {
-            throw new \Exception('Invalid server response');
+            throw new Exception('Invalid server response');
         }
         $errno = curl_errno($curl);
         $error = curl_error($curl);
         curl_close($curl);
         if ($errno > 0) {
-            throw new \Exception($error);
+            throw new Exception($error);
         }
         $json = json_decode($this->lastResult);
         if (is_null($json)) {
-            throw new \Exception('Invalid server response');
+            throw new Exception('Invalid server response');
         }
         if (!$json->success) {
-            throw new \Exception('Request failed');
+            throw new Exception('Request failed');
         }
         return $json;
     }
@@ -51,10 +51,10 @@ class GermanAddressValidation
      * @return stdClass[]
      * @throws Exception
      */
-    public function searchCityByPostCode($postCode)
+    public function searchCityByPostCode(string $postCode): array
     {
         if (!preg_match('~[0-9]{5}~', $postCode)) {
-            throw new \Exception('Invalid postcode');
+            throw new Exception('Invalid postcode');
         }
 
         $postFields = [
@@ -63,12 +63,7 @@ class GermanAddressValidation
             'lang' => 'de_DE'
         ];
         $result = $this->request($postFields);
-        if (isset($result->rows)) {
-            return $result->rows;
-        }
-        else {
-            return array();
-        }
+        return $result->rows ?? [];
     }
 
     /**
@@ -77,7 +72,7 @@ class GermanAddressValidation
      * @return stdClass[]
      * @throws Exception
      */
-    public function searchPostCodeByCityStreet($city, $street)
+    public function searchPostCodeByCityStreet(string $city, string $street): array
     {
         $postFields = [
             'finda' => 'plz',
@@ -89,12 +84,7 @@ class GermanAddressValidation
             'lang' => 'de_DE'
         ];
         $result = $this->request($postFields);
-        if (isset($result->rows)) {
-            return $result->rows;
-        }
-        else {
-            return array();
-        }
+        return $result->rows ?? [];
     }
 
     /**
@@ -102,7 +92,7 @@ class GermanAddressValidation
      * @return bool
      * @throws Exception
      */
-    public function validatePostCode($postCode)
+    public function validatePostCode(string $postCode): bool
     {
         $cities = $this->searchCityByPostCode($postCode);
         return (count($cities) > 0);
@@ -115,7 +105,7 @@ class GermanAddressValidation
      * @return bool
      * @throws Exception
      */
-    public function validateAddress($city, $street, $postCode)
+    public function validateAddress(string $city, string $street, string $postCode): bool
     {
         $matches = $this->searchPostCodeByCityStreet($city, $street);
         foreach($matches as $address) {
@@ -125,5 +115,4 @@ class GermanAddressValidation
         }
         return false;
     }
-
 }

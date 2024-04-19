@@ -14,9 +14,9 @@ final class GermanAddressValidationTest extends TestCase
     /**
      * @var GermanAddressValidation
      */
-    protected $testObject;
+    protected GermanAddressValidation $testObject;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->testObject = new GermanAddressValidation();
     }
@@ -24,7 +24,7 @@ final class GermanAddressValidationTest extends TestCase
     /**
      * @return array
      */
-    public function providerSearchCityByPostCode()
+    public static function providerSearchCityByPostCode(): array
     {
         return array(
             array('80636', 'München'),
@@ -35,12 +35,13 @@ final class GermanAddressValidationTest extends TestCase
     }
 
     /**
-     * @param $postCode
-     * @param $expected
+     * @param string $postCode
+     * @param string $expected
      *
+     * @throws Exception
      * @dataProvider providerSearchCityByPostCode
      */
-    public function testSearchCityByPostCode($postCode, $expected)
+    public function testSearchCityByPostCode(string $postCode, string $expected): void
     {
         $matches = $this->testObject->searchCityByPostCode($postCode);
         $city = (count($matches) > 0)?$matches[0]->city:'invalid';
@@ -51,7 +52,7 @@ final class GermanAddressValidationTest extends TestCase
     /**
      * @return array
      */
-    public function providerValidatePostCode()
+    public static function providerValidatePostCode(): array
     {
         return array(
             array('80636', true),
@@ -60,12 +61,13 @@ final class GermanAddressValidationTest extends TestCase
     }
 
     /**
-     * @param $postCode
-     * @param $expected
+     * @param string $postCode
+     * @param bool $expected
      *
+     * @throws Exception
      * @dataProvider providerValidatePostCode
      */
-    public function testValidatePostCode($postCode, $expected)
+    public function testValidatePostCode(string $postCode, bool $expected): void
     {
         $this->assertEquals( $expected, $this->testObject->validatePostCode($postCode));
     }
@@ -74,7 +76,7 @@ final class GermanAddressValidationTest extends TestCase
     /**
      * @return array
      */
-    public function providerSearchPostCodeByCityStreet()
+    public static function providerSearchPostCodeByCityStreet(): array
     {
         return array(
             array('München', 'Erika-Mann-Straße 33',  '80636'),
@@ -83,12 +85,14 @@ final class GermanAddressValidationTest extends TestCase
     }
 
     /**
-     * @param $postCode
-     * @param $expected
+     * @param string $city
+     * @param string $street
+     * @param string $expected
      *
+     * @throws Exception
      * @dataProvider providerSearchPostCodeByCityStreet
      */
-    public function testSearchPostCodeByCityStreet($city, $street, $expected)
+    public function testSearchPostCodeByCityStreet(string $city, string $street, string $expected): void
     {
         $matches = $this->testObject->searchPostCodeByCityStreet($city, $street);
         $postCode = (count($matches) > 0)?$matches[0]->plz:'invalid';
@@ -99,7 +103,7 @@ final class GermanAddressValidationTest extends TestCase
     /**
      * @return array
      */
-    public function providerValidateAddress()
+    public static function providerValidateAddress(): array
     {
         return array(
             array('München', 'Erika-Mann-Straße 33', '80636', true),
@@ -108,15 +112,16 @@ final class GermanAddressValidationTest extends TestCase
     }
 
     /**
-     * @param $postCode
-     * @param $expected
+     * @param string $city
+     * @param string $street
+     * @param string $postCode
+     * @param bool $expected
      *
+     * @throws Exception
      * @dataProvider providerValidateAddress
      */
-    public function testValidateAddress($city, $street, $postCode, $expected)
+    public function testValidateAddress(string $city, string $street, string $postCode, bool $expected): void
     {
         $this->assertEquals( $expected, $this->testObject->validateAddress($city, $street, $postCode));
     }
-
 }
-
